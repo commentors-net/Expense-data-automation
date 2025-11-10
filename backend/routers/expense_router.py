@@ -39,7 +39,8 @@ async def get_expenses(
         }
         
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to retrieve expenses: {str(e)}")
+        print(f"Error retrieving expenses: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to retrieve expenses")
 
 
 @router.get("/expenses")
@@ -60,7 +61,8 @@ async def list_all_years() -> Dict[str, Any]:
         }
         
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to retrieve years: {str(e)}")
+        print(f"Error retrieving years: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to retrieve years")
 
 
 @router.delete("/expenses/{year}")
@@ -78,14 +80,18 @@ async def delete_year_expenses(year: str) -> Dict[str, Any]:
         result = await delete_expenses_by_year(year)
         
         if result["status"] == "error":
-            raise HTTPException(status_code=500, detail=result.get("message", "Deletion failed"))
+            # Log the error message internally
+            print(f"Deletion error: {result.get('message', 'Unknown error')}")
+            raise HTTPException(status_code=500, detail="Failed to delete expenses")
         
         return result
         
     except HTTPException:
         raise
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to delete expenses: {str(e)}")
+        # Log the error internally but don't expose details to user
+        print(f"Error deleting expenses: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to delete expenses")
 
 
 @router.get("/stats/{year}")
@@ -134,4 +140,5 @@ async def get_year_stats(year: str) -> Dict[str, Any]:
         }
         
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to calculate stats: {str(e)}")
+        print(f"Error calculating stats: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to calculate statistics")

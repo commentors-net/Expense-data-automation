@@ -54,8 +54,11 @@ async def upload_expense_file(
             if not raw_data:
                 raise HTTPException(status_code=400, detail="Excel file is empty")
             
+        except HTTPException:
+            raise
         except Exception as e:
-            raise HTTPException(status_code=400, detail=f"Failed to parse Excel file: {str(e)}")
+            print(f"Excel parsing error: {str(e)}")
+            raise HTTPException(status_code=400, detail="Failed to parse Excel file. Please ensure it is a valid Excel file.")
         
         # Normalize data using AI
         try:
@@ -64,14 +67,18 @@ async def upload_expense_file(
             if not normalized_data:
                 raise HTTPException(status_code=500, detail="AI normalization returned no data")
                 
+        except HTTPException:
+            raise
         except Exception as e:
-            raise HTTPException(status_code=500, detail=f"AI normalization failed: {str(e)}")
+            print(f"AI normalization error: {str(e)}")
+            raise HTTPException(status_code=500, detail="Failed to normalize data")
         
         # Save to Firestore
         try:
             result = await save_expenses(year, normalized_data, original_filename)
         except Exception as e:
-            raise HTTPException(status_code=500, detail=f"Failed to save to Firestore: {str(e)}")
+            print(f"Firestore save error: {str(e)}")
+            raise HTTPException(status_code=500, detail="Failed to save expenses to database")
         
         # Upload to Cloud Storage (optional, doesn't fail the request)
         try:
@@ -86,7 +93,9 @@ async def upload_expense_file(
     except HTTPException:
         raise
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Unexpected error: {str(e)}")
+        # Log the error internally but don't expose details to user
+        print(f"Unexpected error in upload: {str(e)}")
+        raise HTTPException(status_code=500, detail="An unexpected error occurred during upload")
     finally:
         # Cleanup temporary file
         if temp_file_path:
@@ -129,8 +138,11 @@ async def preview_expense_file(
             if not raw_data:
                 raise HTTPException(status_code=400, detail="Excel file is empty")
             
+        except HTTPException:
+            raise
         except Exception as e:
-            raise HTTPException(status_code=400, detail=f"Failed to parse Excel file: {str(e)}")
+            print(f"Excel parsing error in preview: {str(e)}")
+            raise HTTPException(status_code=400, detail="Failed to parse Excel file. Please ensure it is a valid Excel file.")
         
         # Normalize data using AI
         try:
@@ -147,12 +159,14 @@ async def preview_expense_file(
             }
             
         except Exception as e:
-            raise HTTPException(status_code=500, detail=f"AI normalization failed: {str(e)}")
+            print(f"AI normalization error in preview: {str(e)}")
+            raise HTTPException(status_code=500, detail="Failed to normalize data")
         
     except HTTPException:
         raise
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Unexpected error: {str(e)}")
+        print(f"Unexpected error in preview: {str(e)}")
+        raise HTTPException(status_code=500, detail="An unexpected error occurred during preview")
     finally:
         # Cleanup temporary file
         if temp_file_path:

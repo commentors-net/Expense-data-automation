@@ -44,54 +44,137 @@ Database (Firestore)
 ## 📁 Project Structure
 
 ```
-smart-expense-importer/
-├── backend/
-│   ├── app.js                # Main API server (Express or FastAPI)
+Expense-data-automation/
+├── backend/                   # FastAPI Python Backend
+│   ├── main.py               # Main API server
+│   ├── routers/
+│   │   ├── upload_router.py  # File upload endpoints
+│   │   └── expense_router.py # Expense management endpoints
 │   ├── services/
-│   │   ├── excelParser.js    # Extracts tabular data from Excel
-│   │   ├── aiMapper.js       # Sends extracted data to Gemini API for normalization
-│   │   ├── firestore.js      # Handles writes/reads to Firestore
-│   └── .env.example          # API keys, Firestore credentials
+│   │   ├── ai_parser.py      # AI normalization with Gemini API
+│   │   ├── firestore_service.py  # Firestore operations
+│   │   └── storage_service.py    # Google Cloud Storage
+│   ├── utils/
+│   │   └── file_utils.py     # File handling utilities
+│   ├── tests/                # Unit tests
+│   ├── requirements.txt
+│   └── .env.example
 │
-├── frontend/
+├── frontend/                  # React TypeScript Frontend
 │   ├── src/
+│   │   ├── api/
+│   │   │   └── expenses.ts   # API client
 │   │   ├── components/
-│   │   │   ├── FileUpload.tsx
-│   │   │   ├── ExpensePreviewTable.tsx
-│   │   └── pages/
-│   │       └── Dashboard.tsx
-│   └── package.json
+│   │   │   ├── FileUploader.tsx
+│   │   │   ├── ExpensePreview.tsx
+│   │   │   └── ImportSummary.tsx
+│   │   ├── pages/
+│   │   │   └── Dashboard.tsx
+│   │   ├── App.tsx
+│   │   └── main.tsx
+│   ├── package.json
+│   └── .env.example
 │
+├── INSTRUCTIONS_FOR_COPILOT.md
 └── README.md
 ```
 
 ---
 
-## ⚙️ Backend Setup
+## 🚀 Quick Start
 
-### 1. Requirements
-- Node.js 20+ (or Python 3.10+)
-- Firestore project set up (Firebase)
-- Gemini (Google AI Studio) API key
+### Backend Setup
 
-### 2. Environment Variables (`.env`)
+1. **Navigate to backend directory:**
+   ```bash
+   cd backend
+   ```
+
+2. **Create virtual environment:**
+   ```bash
+   python -m venv venv
+   source venv/bin/activate  # On Windows: venv\Scripts\activate
+   ```
+
+3. **Install dependencies:**
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+4. **Configure environment:**
+   ```bash
+   cp .env.example .env
+   # Edit .env with your credentials
+   ```
+
+5. **Run the server:**
+   ```bash
+   uvicorn main:app --reload
+   ```
+
+   Backend API will be available at `http://localhost:8000`
+   API documentation at `http://localhost:8000/docs`
+
+### Frontend Setup
+
+1. **Navigate to frontend directory:**
+   ```bash
+   cd frontend
+   ```
+
+2. **Install dependencies:**
+   ```bash
+   npm install
+   ```
+
+3. **Configure environment (optional):**
+   ```bash
+   cp .env.example .env
+   # Default backend URL is already set to http://localhost:8000/api
+   ```
+
+4. **Run development server:**
+   ```bash
+   npm run dev
+   ```
+
+   Frontend will be available at `http://localhost:5173`
+
+---
+
+## ⚙️ Environment Variables
+
+### Backend (.env)
 ```bash
-GEMINI_API_KEY=your_gemini_key
-GOOGLE_APPLICATION_CREDENTIALS=/path/to/firestore-service-account.json
+GEMINI_API_KEY=your_gemini_api_key_here
+GOOGLE_APPLICATION_CREDENTIALS=/path/to/firebase-credentials.json
+FIRESTORE_COLLECTION=expenses
+GCP_BUCKET=expense-uploads
 ```
 
-### 3. Install & Run
+### Frontend (.env)
 ```bash
-cd backend
-npm install
-npm start
+VITE_API_BASE_URL=http://localhost:8000/api
 ```
 
 ---
 
+## 📚 API Documentation
+
+Full API documentation is available at `http://localhost:8000/docs` when running the backend.
+
+### Main Endpoints
+
+- **POST /api/upload** - Upload and process Excel file
+- **POST /api/preview** - Preview normalized data without saving
+- **GET /api/expenses** - Get all years with data
+- **GET /api/expenses/{year}** - Get expenses for a specific year
+- **GET /api/stats/{year}** - Get statistics for a year
+- **DELETE /api/expenses/{year}** - Delete all expenses for a year
+
 ## 🔍 Example API Flow
 
-### POST `/upload-expense`
+### POST `/api/upload`
 **Description:** Accepts an Excel file and the corresponding year.
 
 #### Request
@@ -224,7 +307,30 @@ MIT License © 2025 — Smart Expense Importer Project
 
 ---
 
-## 🧩 Example Screenshot (Concept)
-*(To be added once frontend UI is implemented)*
+## 🧪 Testing
+
+### Backend Tests
+```bash
+cd backend
+pytest
+```
+
+### Frontend Tests
+```bash
+cd frontend
+npm test  # After setting up Vitest
+```
+
+---
+
+## 📝 Development Notes
+
+- Backend uses FastAPI with Python 3.10+
+- Frontend built with React 18 + TypeScript + Vite
+- AI normalization powered by Google Gemini API
+- Data stored in Google Firestore
+- File backups in Google Cloud Storage
+- Material-UI for frontend components
+- Full CORS support for local development
 
 ---

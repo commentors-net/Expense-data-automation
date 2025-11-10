@@ -83,7 +83,7 @@ Expense-data-automation/
 
 ## 🚀 Quick Start
 
-### Backend Setup
+### Backend Setup (SQLite - No Cloud Required!)
 
 1. **Navigate to backend directory:**
    ```bash
@@ -104,7 +104,8 @@ Expense-data-automation/
 4. **Configure environment:**
    ```bash
    cp .env.example .env
-   # Edit .env with your credentials
+   # Edit .env - set ENVIRONMENT=development
+   # Add your GEMINI_API_KEY (get from https://aistudio.google.com/apikey)
    ```
 
 5. **Run the server:**
@@ -112,8 +113,10 @@ Expense-data-automation/
    uvicorn main:app --reload
    ```
 
-   Backend API will be available at `http://localhost:8000`
+   Backend API will be available at `http://localhost:8000`  
    API documentation at `http://localhost:8000/docs`
+   
+   **Note:** In development mode, all data is stored in a local `expenses.db` SQLite file.
 
 ### Frontend Setup
 
@@ -146,7 +149,16 @@ Expense-data-automation/
 
 ### Backend (.env)
 ```bash
+# Environment: development (uses SQLite) or production (uses Firestore)
+ENVIRONMENT=development
+
+# Secret key for session management
+SECRET_KEY=your-32-byte-hex-key-here
+
+# AI Service
 GEMINI_API_KEY=your_gemini_api_key_here
+
+# Google Cloud (only needed for ENVIRONMENT=production)
 GOOGLE_APPLICATION_CREDENTIALS=/path/to/firebase-credentials.json
 FIRESTORE_COLLECTION=expenses
 GCP_BUCKET=expense-uploads
@@ -156,6 +168,15 @@ GCP_BUCKET=expense-uploads
 ```bash
 VITE_API_BASE_URL=http://localhost:8000/api
 ```
+
+### 🔄 Database Abstraction
+
+The application automatically switches between databases based on the `ENVIRONMENT` variable:
+
+- **`ENVIRONMENT=development`** → Uses **SQLite** (local file, no cloud credentials needed)
+- **`ENVIRONMENT=production`** → Uses **Firestore** (requires Google Cloud setup)
+
+This means you can develop locally without setting up Google Cloud, and seamlessly deploy to production with Firestore.
 
 ---
 

@@ -2,12 +2,8 @@
 Expense router for querying and managing expense data.
 """
 from fastapi import APIRouter, HTTPException, Query
-from typing import Dict, Any, List
-from services.firestore_service import (
-    get_expenses_by_year,
-    get_all_years,
-    delete_expenses_by_year
-)
+from typing import Dict, Any, List, Optional
+from db_factory import db
 
 
 router = APIRouter()
@@ -29,7 +25,7 @@ async def get_expenses(
         Dictionary with expense data
     """
     try:
-        expenses = await get_expenses_by_year(year, limit)
+        expenses = await db.get_expenses_by_year(year, limit)
         
         return {
             "status": "ok",
@@ -52,7 +48,7 @@ async def list_all_years() -> Dict[str, Any]:
         Dictionary with list of years
     """
     try:
-        years = await get_all_years()
+        years = await db.get_all_years()
         
         return {
             "status": "ok",
@@ -77,7 +73,7 @@ async def delete_year_expenses(year: str) -> Dict[str, Any]:
         Dictionary with deletion results
     """
     try:
-        result = await delete_expenses_by_year(year)
+        result = await db.delete_expenses_by_year(year)
         
         if result["status"] == "error":
             # Log the error message internally
@@ -106,39 +102,57 @@ async def get_year_stats(year: str) -> Dict[str, Any]:
         Dictionary with expense statistics
     """
     try:
-        expenses = await get_expenses_by_year(year, limit=1000)
-        
-        if not expenses:
-            return {
-                "status": "ok",
-                "year": year,
-                "total_expenses": 0,
-                "total_amount": 0,
-                "categories": {}
-            }
-        
-        # Calculate statistics
-        total_amount = sum(exp.get("amount", 0) for exp in expenses)
-        categories = {}
-        
-        for exp in expenses:
-            category = exp.get("category", "Unknown")
-            if category not in categories:
-                categories[category] = {
-                    "count": 0,
-                    "total": 0
-                }
-            categories[category]["count"] += 1
-            categories[category]["total"] += exp.get("amount", 0)
+        stats = await db.get_year_statistics(year)
         
         return {
             "status": "ok",
-            "year": year,
-            "total_expenses": len(expenses),
-            "total_amount": total_amount,
-            "categories": categories
+            **stats
         }
         
     except Exception as e:
         print(f"Error calculating stats: {str(e)}")
         raise HTTPException(status_code=500, detail="Failed to calculate statistics")
+
+
+@router.get("/search")
+async def search_expenses(
+    year: Optional[str] = Query(None),
+    category: Optional[str] = Query(None),
+    date_from: Optional[str] = Query(None),
+    date_to: Optional[str] = Query(None),
+    min_amount: Optional[float] = Query(None),
+    max_amount: Optional[float] = Query(None)
+) -> Dict[str, Any]:
+    """
+    Search expenses with various filters.
+    
+    Args:
+        year: Filter by year
+        category: Filter by category
+        date_from: Filter by start date (YYYY-MM-DD)
+        date_to: Filter by end date (YYYY-MM-DD)
+        min_amount: Minimum amount
+        max_amount: Maximum amount
+        
+    Returns:
+        Dictionary with filtered expense data
+    """
+    try:
+        expenses = await db.search_expenses(
+            year=year,
+            category=category,
+            date_from=date_from,
+            date_to=date_to,
+            min_amount=min_amount,
+            max_amount=max_amount
+        )
+        
+        return {
+            "status": "ok",
+            "count": len(expenses),
+            "expenses": expenses
+        }
+        
+    except Exception as e:
+        print(f"Error searching expenses: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to search expenses")

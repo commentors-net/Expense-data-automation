@@ -74,13 +74,22 @@ ai-expense-import/
    cd backend
    python -m venv venv
    source venv/bin/activate
-   pip install fastapi uvicorn pandas openpyxl google-cloud-firestore google-cloud-storage python-dotenv httpx
+   pip install fastapi uvicorn pandas openpyxl google-cloud-firestore google-cloud-storage python-dotenv httpx python-multipart pytest pytest-asyncio
    ```
+
+2. **Database Abstraction Layer**
+   - `db_factory.py` - Automatically selects SQLite (dev) or Firestore (prod)
+   - `services/sqlite_db.py` - SQLite implementation
+   - `services/firestore_db.py` - Firestore implementation
+   - Both implement the same interface for seamless switching
 
 2. **Create `.env`**
    ```
-   GOOGLE_APPLICATION_CREDENTIALS=/path/to/credentials.json
+   ENVIRONMENT=development
+   SECRET_KEY=your-32-byte-hex-key
    GEMINI_API_KEY=your_api_key_here
+   # For production only:
+   GOOGLE_APPLICATION_CREDENTIALS=/path/to/credentials.json
    FIRESTORE_COLLECTION=expenses
    GCP_BUCKET=expense-uploads
    ```
@@ -96,7 +105,7 @@ ai-expense-import/
    - Save temporarily or directly to Cloud Storage
    - Extract sheet data via `pandas.read_excel()`
    - Send extracted rows to `ai_parser.normalize_expense_data()`
-   - Store returned JSON into Firestore via `firestore_service`
+   - Store returned JSON into database via `db.save_expenses()` (uses db_factory)
 
 5. **`ai_parser.py`**
    - Function `normalize_expense_data(raw_data: list[dict]) -> list[dict]`
@@ -106,10 +115,17 @@ ai-expense-import/
      { "date": "2024-01-03", "category": "Transport", "description": "Taxi", "amount": 35.0 }
      ```
 
-6. **`firestore_service.py`**
-   - Initialize Firestore client
-   - Function `save_expense(year: str, expense_data: list[dict])`
-   - Batch insert all normalized records under collection `/expenses/{year}`
+6. **`db_factory.py`**
+   - Reads `ENVIRONMENT` variable
+   - Returns `SQLiteDatabase()` for development
+   - Returns `FirestoreDatabase()` for production
+   - Provides common interface: `save_expenses()`, `get_expenses_by_year()`, etc.
+
+7. **`sqlite_db.py`** and **`firestore_db.py`**
+   - Both implement identical interface
+   - SQLite: Local file storage (expenses.db)
+   - Firestore: Cloud NoSQL database
+   - Seamless switching without code changes
 
 7. **`storage_service.py`**
    - Handles upload/download to Google Cloud Storage

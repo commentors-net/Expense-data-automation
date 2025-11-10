@@ -6,8 +6,8 @@ from typing import Dict, Any
 import pandas as pd
 from utils.file_utils import validate_excel_file, save_upload_file_temp, cleanup_temp_file
 from services.ai_parser import normalize_expense_data
-from services.firestore_service import save_expenses
 from services.storage_service import upload_file_to_storage
+from db_factory import db
 
 
 router = APIRouter()
@@ -73,11 +73,11 @@ async def upload_expense_file(
             print(f"AI normalization error: {str(e)}")
             raise HTTPException(status_code=500, detail="Failed to normalize data")
         
-        # Save to Firestore
+        # Save to database (SQLite or Firestore)
         try:
-            result = await save_expenses(year, normalized_data, original_filename)
+            result = await db.save_expenses(year, normalized_data, original_filename)
         except Exception as e:
-            print(f"Firestore save error: {str(e)}")
+            print(f"Database save error: {str(e)}")
             raise HTTPException(status_code=500, detail="Failed to save expenses to database")
         
         # Upload to Cloud Storage (optional, doesn't fail the request)

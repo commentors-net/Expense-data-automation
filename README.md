@@ -1,73 +1,73 @@
-# ðŸ’° Smart Expense Importer (AI + Firestore)
+# 💰 Smart Expense Importer (AI + Firestore)
 
-## ðŸ“˜ Overview
+## 📘 Overview
 
-**Smart Expense Importer** is an intelligent tool that lets you upload yearly Excel files of expenses â€” even if each yearâ€™s file has a slightly different structure â€” and automatically extracts, normalizes, and stores the data in **Google Firestore**.
+**Smart Expense Importer** is an intelligent tool that lets you upload yearly Excel files of expenses — even if each year’s file has a slightly different structure — and automatically extracts, normalizes, and stores the data in **Google Firestore**.
 
 This system uses an AI model (Gemini, GPT, or any LLM) to understand column meanings, normalize inconsistent formats, and ensure your multi-year expense history lives in a single, searchable, and centralized system.
 
 ---
 
-## âœ¨ Key Features
+## ✨ Key Features
 
-- ðŸ“‚ Upload Excel files for any year (`.xlsx`, `.xls`)
-- ðŸ§  AI-based column mapping (handles format variations between years)
-- ðŸ” Preview and confirm parsed results before importing
-- â˜ï¸ Centralized data stored in **Firestore**
-- ðŸ“Š Year-wise expense visualization (optional future enhancement)
-- ðŸ” Duplicate detection and data validation
-- âš¡ Cloud-ready (Firebase Functions or Node/Express backend)
+- 📂 Upload Excel files for any year (`.xlsx`, `.xls`)
+- 🧠 AI-based column mapping (handles format variations between years)
+- 🔍 Preview and confirm parsed results before importing
+- ☁️ Centralized data stored in **Firestore**
+- 📊 Year-wise expense visualization (optional future enhancement)
+- 🔁 Duplicate detection and data validation
+- ⚡ Cloud-ready (Firebase Functions or Node/Express backend)
 
 ---
 
-## ðŸ—ï¸ Architecture
+## 🏗️ Architecture
 
 ```
 Frontend (React)
-â”‚
-â”œâ”€â”€ File Upload (Excel)
-â”‚       â†“
-â”‚   POST /upload-expense
-â”‚
+│
+├── File Upload (Excel)
+│       ↓
+│   POST /upload-expense
+│
 Backend (Node.js / Python)
-â”‚
-â”œâ”€â”€ Excel Parser (pandas / exceljs)
-â”œâ”€â”€ AI Normalizer (Gemini API)
-â”œâ”€â”€ Firestore Writer
-â”‚
+│
+├── Excel Parser (pandas / exceljs)
+├── AI Normalizer (Gemini API)
+├── Firestore Writer
+│
 Database (Firestore)
-â””â”€â”€ /expenses/{year}/{expense_id}
+└── /expenses/{year}/{expense_id}
 ```
 
 ---
 
-## ðŸ“ Project Structure
+## 📁 Project Structure
 
 ```
 smart-expense-importer/
-â”œâ”€â”€ backend/
-â”‚   â”œâ”€â”€ app.js                # Main API server (Express or FastAPI)
-â”‚   â”œâ”€â”€ services/
-â”‚   â”‚   â”œâ”€â”€ excelParser.js    # Extracts tabular data from Excel
-â”‚   â”‚   â”œâ”€â”€ aiMapper.js       # Sends extracted data to Gemini API for normalization
-â”‚   â”‚   â”œâ”€â”€ firestore.js      # Handles writes/reads to Firestore
-â”‚   â””â”€â”€ .env.example          # API keys, Firestore credentials
-â”‚
-â”œâ”€â”€ frontend/
-â”‚   â”œâ”€â”€ src/
-â”‚   â”‚   â”œâ”€â”€ components/
-â”‚   â”‚   â”‚   â”œâ”€â”€ FileUpload.tsx
-â”‚   â”‚   â”‚   â”œâ”€â”€ ExpensePreviewTable.tsx
-â”‚   â”‚   â””â”€â”€ pages/
-â”‚   â”‚       â””â”€â”€ Dashboard.tsx
-â”‚   â””â”€â”€ package.json
-â”‚
-â””â”€â”€ README.md
+├── backend/
+│   ├── app.js                # Main API server (Express or FastAPI)
+│   ├── services/
+│   │   ├── excelParser.js    # Extracts tabular data from Excel
+│   │   ├── aiMapper.js       # Sends extracted data to Gemini API for normalization
+│   │   ├── firestore.js      # Handles writes/reads to Firestore
+│   └── .env.example          # API keys, Firestore credentials
+│
+├── frontend/
+│   ├── src/
+│   │   ├── components/
+│   │   │   ├── FileUpload.tsx
+│   │   │   ├── ExpensePreviewTable.tsx
+│   │   └── pages/
+│   │       └── Dashboard.tsx
+│   └── package.json
+│
+└── README.md
 ```
 
 ---
 
-## âš™ï¸ Backend Setup
+## ⚙️ Backend Setup
 
 ### 1. Requirements
 - Node.js 20+ (or Python 3.10+)
@@ -89,7 +89,7 @@ npm start
 
 ---
 
-## ðŸ” Example API Flow
+## 🔍 Example API Flow
 
 ### POST `/upload-expense`
 **Description:** Accepts an Excel file and the corresponding year.
@@ -134,7 +134,7 @@ npm start
 
 ---
 
-## ðŸ§  AI Mapping Logic (Gemini Prompt Example)
+## 🧠 AI Mapping Logic (Gemini Prompt Example)
 
 ```text
 You are an expert data normalizer. 
@@ -151,7 +151,7 @@ Only output JSON. Assume the provided 'year' if the date is missing the year.
 
 ---
 
-## ðŸ§© Firestore Data Model
+## 🧩 Firestore Data Model
 
 ```json
 {
@@ -169,7 +169,7 @@ Only output JSON. Assume the provided 'year' if the date is missing the year.
 
 ---
 
-## ðŸ–¥ï¸ Frontend Features (React)
+## 🖥️ Frontend Features (React)
 
 - Drag-and-drop Excel upload (`FileUpload.tsx`)
 - Upload progress bar
@@ -180,7 +180,7 @@ Only output JSON. Assume the provided 'year' if the date is missing the year.
 
 ---
 
-## ðŸš€ Deployment Options
+## 🚀 Deployment Options
 
 | Environment | Suggested Tech | Notes |
 |--------------|----------------|-------|
@@ -190,7 +190,7 @@ Only output JSON. Assume the provided 'year' if the date is missing the year.
 
 ---
 
-## ðŸ”’ Security Notes
+## 🔒 Security Notes
 
 - Validate Excel file types before upload
 - Sanitize AI outputs (e.g., ensure `amount` is numeric)
@@ -199,7 +199,7 @@ Only output JSON. Assume the provided 'year' if the date is missing the year.
 
 ---
 
-## ðŸ“Š Future Enhancements
+## 📊 Future Enhancements
 
 - AI-powered **expense categorization**
 - Dashboard with monthly/annual charts
@@ -209,7 +209,7 @@ Only output JSON. Assume the provided 'year' if the date is missing the year.
 
 ---
 
-## ðŸ§‘â€ðŸ’» Contributing
+## 🧑‍💻 Contributing
 
 1. Fork this repository
 2. Create a new branch (`feature/xyz`)
@@ -218,13 +218,13 @@ Only output JSON. Assume the provided 'year' if the date is missing the year.
 
 ---
 
-## ðŸ“„ License
+## 📄 License
 
-MIT License Â© 2025 â€” Smart Expense Importer Project
+MIT License © 2025 — Smart Expense Importer Project
 
 ---
 
-## ðŸ§© Example Screenshot (Concept)
+## 🧩 Example Screenshot (Concept)
 *(To be added once frontend UI is implemented)*
 
 ---
